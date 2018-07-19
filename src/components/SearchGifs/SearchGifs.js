@@ -1,21 +1,12 @@
 import React, { Component } from 'react'
-import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  StyleSheet,
-  Text,
-  TextInput,
-  ScrollView,
-  Button,
-  Image,
-  TouchableOpacity
-} from 'react-native'
+import { GIPHY_API_KEY } from 'react-native-dotenv'
+import { ActivityIndicator, KeyboardAvoidingView, StyleSheet, Text, TextInput, ScrollView, Button } from 'react-native'
 import axios from 'axios'
+import PreviewGif from './PreviewGif'
 class Set extends Component {
   constructor () {
     super()
     this.state = { searchTerm: '', gifs: [], currentGif: '' }
-    this.previewGif = this.previewGif.bind(this)
     this.onSearch = this.onSearch.bind(this)
     this.onChange = this.onChange.bind(this)
     this.clearSearch = this.clearSearch.bind(this)
@@ -28,21 +19,11 @@ class Set extends Component {
   async onSearch () {
     this.setState({ loading: true })
     console.log(this.state.searchTerm)
-    const url = `https://api.giphy.com/v1/gifs/search?api_key=IDBFA6B2F25bFLEZ1XWyDZWGLv1OGQZV&q=${
+    const url = `https://api.giphy.com/v1/gifs/search?api_key=${GIPHY_API_KEY}&q=${
       this.state.searchTerm
     }&limit=25&offset=0&rating=PG-13&lang=en`
     const results = await axios.get(url)
     this.setState({ gifs: results.data.data, loading: false })
-  }
-
-  previewGif (gif) {
-    if (gif.images && gif.images && gif.images.fixed_height_small) {
-      return (
-        <TouchableOpacity key={gif.id} onPress={() => this.props.setCurrentGif(gif.images.original.url)}>
-          <Image style={styles.previewGif} source={{ uri: gif.images.fixed_height_small.url }} />
-        </TouchableOpacity>
-      )
-    }
   }
 
   clearSearch () {
@@ -66,7 +47,7 @@ class Set extends Component {
         </Button>
         {this.state.loading && <ActivityIndicator size='large' color='#0000ff' />}
         <ScrollView contentContainerStyle={styles.scrollContainer} keyboardDismissMode={'on-drag'}>
-          {this.state.gifs.map(this.previewGif)}
+          {this.state.gifs.map(gif => <PreviewGif setCurrentGif={this.props.setCurrentGif} gif={gif} key={gif.id} />)}
         </ScrollView>
       </KeyboardAvoidingView>
     )
@@ -95,13 +76,10 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: 'gray',
+    borderRadius: 40,
+    padding: 20,
     fontSize: 40,
     width: 300
-  },
-  previewGif: {
-    height: 100,
-    width: 100,
-    margin: 10
   }
 })
 

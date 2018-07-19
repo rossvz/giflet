@@ -1,41 +1,40 @@
 import React from 'react'
-import { StyleSheet, View, TouchableOpacity, Text } from 'react-native'
-import CurrentGif from './src/components/Gif'
-import Set from './src/components/Set'
-import { withNetworkConnectivity } from 'react-native-offline'
+import { StyleSheet, View } from 'react-native'
+import SearchGifs from './src/components/SearchGifs/SearchGifs'
+import CurrentGif from './src/components/CurrentGif'
 
-export default withNetworkConnectivity()(
-  class App extends React.Component {
-    constructor () {
-      super()
-      this.state = { currentGif: '', showSearch: true }
+export default class App extends React.Component {
+  constructor () {
+    super()
+    this.state = { currentGif: '', showSearch: true }
 
-      this.setCurrentGif = this.setCurrentGif.bind(this)
-    }
-
-    setCurrentGif (url) {
-      this.setState({
-        currentGif: url,
-        showSearch: false
-      })
-    }
-
-    render () {
-      if (!this.props.isConnected) return <Text>No connectivity</Text>
-      return (
-        <View style={styles.container}>
-          {this.state.showSearch ? (
-            <Set setCurrentGif={this.setCurrentGif} />
-          ) : (
-            <TouchableOpacity onPress={() => this.setState({ showSearch: true })}>
-              <CurrentGif source={this.state.currentGif} />
-            </TouchableOpacity>
-          )}
-        </View>
-      )
-    }
+    this.setCurrentGif = this.setCurrentGif.bind(this)
+    this.showSearch = this.showSearch.bind(this)
   }
-)
+
+  setCurrentGif (url) {
+    this.setState({
+      currentGif: url,
+      showSearch: false
+    })
+  }
+
+  showSearch () {
+    this.setState({ showSearch: true })
+  }
+
+  render () {
+    return (
+      <View style={styles.container}>
+        {this.state.showSearch ? (
+          <SearchGifs setCurrentGif={this.setCurrentGif} />
+        ) : (
+          <CurrentGif showSearch={this.showSearch} currentGif={this.state.currentGif} />
+        )}
+      </View>
+    )
+  }
+}
 
 const styles = StyleSheet.create({
   container: {
